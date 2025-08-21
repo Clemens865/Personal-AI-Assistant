@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: vscode-extension/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd vscode-extension
+        npm ci
+    
+    - name: Compile and test
+      run: |
+        cd vscode-extension
+        npm run compile
+        npm test --if-present
+    
+    - name: Install vsce
+      run: npm install -g vsce
+    
+    - name: Package extension
+      run: |
+        cd vscode-extension
+        vsce package
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Changes in this Release
+          
+          ### Features
+          - New features and improvements
+          
+          ### Bug Fixes
+          - Various bug fixes
+          
+          ### Documentation
+          - Updated documentation
+          
+          Please see the [CHANGELOG](CHANGELOG.md) for detailed information.
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./vscode-extension/vscode-personal-assistant-*.vsix
+        asset_name: vscode-personal-assistant-${{ github.ref_name }}.vsix
+        asset_content_type: application/zip
+    
+    - name: Publish to VS Code Marketplace
+      if: success()
+      run: |
+        cd vscode-extension
+        vsce publish -p ${{ secrets.VSCE_PAT }}
+      continue-on-error: true

@@ -1,24 +1,96 @@
-.DS_Store
-.cache
-npm-debug.log
-Thumbs.db
+# Dependencies
 node_modules/
-.build/
-.vscode/extensions/**/out/
-extensions/**/dist/
-/out*/
-/extensions/**/out/
-build/node_modules
+package-lock.json
+yarn.lock
+
+# Build outputs
+out/
+dist/
+*.vsix
+.vscode-test/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
 coverage/
-test_data/
-test-results/
-test-results.xml
-vscode.lsif
-vscode.db
-/.profile-oss
-/cli/target
-/cli/openssl
-product.overrides.json
-*.snap.actual
-*.tsbuildinfo
-.vscode-test
+.nyc_output/
+*.lcov
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Vault (user data)
+.assistant-vault/
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# VS Code workspace
+*.code-workspace
+
+# Archive folders (keeping archived content out of repo)
+archive/
+
+# VS Code original files to ignore
+VS-code-Assistant-project/
+build/
+cli/
+remote/
+resources/
+scripts/
+extensions/
+test/
+src/vs/
+src/vscode-dts/
+src/typings/
+*.json
+!vscode-extension/**/*.json
+!.github/**/*.json
+eslint.config.js
+gulpfile.js
+tsfmt.json
+product.json
+cglicenses.json
+cgmanifest.json
+
+# Keep our project files
+!vscode-extension/
+!docs/
+!.github/
+!setup.sh
+!README.md
+!LICENSE
+!CLAUDE.md
+!SWARM-STATUS.md
+!mockup-apple-enhanced.html
+!design-*.md

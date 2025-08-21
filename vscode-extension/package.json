@@ -1,0 +1,351 @@
+{
+  "name": "vscode-personal-assistant",
+  "displayName": "Personal Assistant with Obsidian Features",
+  "description": "AI-powered personal assistant for VS Code with advanced knowledge management inspired by Obsidian",
+  "version": "0.1.0",
+  "publisher": "vscode-assistant-team",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "AI",
+    "Notebooks",
+    "Visualization"
+  ],
+  "keywords": [
+    "ai",
+    "assistant",
+    "obsidian",
+    "knowledge",
+    "graph",
+    "notes",
+    "markdown"
+  ],
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#8e7cc3",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Clemens865/Personal-AI-Assistant"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:assistant.createNote",
+    "onCommand:assistant.showGraph",
+    "onCommand:assistant.searchVault",
+    "onCommand:assistant.openChat",
+    "onCommand:assistant.showSettings",
+    "onLanguage:markdown"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "assistant.createNote",
+        "title": "Create New Note",
+        "category": "Assistant",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "assistant.showGraph",
+        "title": "Show Knowledge Graph",
+        "category": "Assistant",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "assistant.searchVault",
+        "title": "Search Vault",
+        "category": "Assistant",
+        "icon": "$(search)"
+      },
+      {
+        "command": "assistant.openChat",
+        "title": "Open AI Chat",
+        "category": "Assistant",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "assistant.insertLink",
+        "title": "Insert Wiki Link",
+        "category": "Assistant",
+        "icon": "$(link)"
+      },
+      {
+        "command": "assistant.showBacklinks",
+        "title": "Show Backlinks",
+        "category": "Assistant",
+        "icon": "$(references)"
+      },
+      {
+        "command": "assistant.applyTemplate",
+        "title": "Apply Template",
+        "category": "Assistant",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "assistant.showSettings",
+        "title": "Assistant Settings",
+        "category": "Assistant",
+        "icon": "$(settings-gear)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "assistant.createNote",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n"
+      },
+      {
+        "command": "assistant.showGraph",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g"
+      },
+      {
+        "command": "assistant.searchVault",
+        "key": "ctrl+alt+f",
+        "mac": "cmd+alt+f"
+      },
+      {
+        "command": "assistant.openChat",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c"
+      },
+      {
+        "command": "assistant.insertLink",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ],
+    "configuration": {
+      "title": "Personal Assistant",
+      "properties": {
+        "assistant.vaultPath": {
+          "type": "string",
+          "default": ".assistant-vault",
+          "description": "Path to the vault folder relative to workspace root"
+        },
+        "assistant.aiProvider": {
+          "type": "string",
+          "enum": ["openai", "anthropic", "local", "auto"],
+          "enumDescriptions": [
+            "Use OpenAI GPT models",
+            "Use Anthropic Claude models",
+            "Use local LLM",
+            "Automatically select best available provider"
+          ],
+          "default": "auto",
+          "description": "AI provider to use for intelligent features"
+        },
+        "assistant.openaiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API key (stored securely)",
+          "scope": "machine"
+        },
+        "assistant.anthropicKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API key (stored securely)",
+          "scope": "machine"
+        },
+        "assistant.autoLinking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect and create links between notes"
+        },
+        "assistant.graphLayout": {
+          "type": "string",
+          "enum": ["force", "hierarchical", "circular", "grid"],
+          "default": "force",
+          "description": "Default layout algorithm for knowledge graph"
+        },
+        "assistant.theme": {
+          "type": "string",
+          "enum": ["light", "dark", "auto"],
+          "default": "auto",
+          "description": "Theme for assistant UI components"
+        },
+        "assistant.enableVoice": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable voice input features"
+        },
+        "assistant.templateFolder": {
+          "type": "string",
+          "default": "templates",
+          "description": "Folder containing note templates"
+        },
+        "assistant.dailyNoteFormat": {
+          "type": "string",
+          "default": "YYYY-MM-DD",
+          "description": "Date format for daily notes"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "assistant-container",
+          "title": "Personal Assistant",
+          "icon": "$(notebook)"
+        }
+      ],
+      "panel": [
+        {
+          "id": "assistant-panel",
+          "title": "Assistant",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "views": {
+      "assistant-container": [
+        {
+          "id": "assistant.vaultExplorer",
+          "name": "Vault Explorer",
+          "icon": "$(folder-library)",
+          "contextualTitle": "Vault Files"
+        },
+        {
+          "id": "assistant.backlinks",
+          "name": "Backlinks",
+          "icon": "$(references)",
+          "contextualTitle": "Linked References"
+        },
+        {
+          "id": "assistant.tags",
+          "name": "Tags",
+          "icon": "$(tag)",
+          "contextualTitle": "Tag Explorer"
+        },
+        {
+          "id": "assistant.tasks",
+          "name": "Tasks",
+          "icon": "$(checklist)",
+          "contextualTitle": "Task Manager"
+        },
+        {
+          "id": "assistant.recentNotes",
+          "name": "Recent Notes",
+          "icon": "$(history)",
+          "contextualTitle": "Recently Modified"
+        }
+      ],
+      "assistant-panel": [
+        {
+          "id": "assistant.chat",
+          "name": "AI Chat",
+          "type": "webview",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "markdown",
+        "extensions": [".md"],
+        "aliases": ["Markdown", "markdown"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "markdown",
+        "scopeName": "text.html.markdown.assistant",
+        "path": "./syntaxes/markdown-extended.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.yaml": "yaml"
+        }
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorLangId == markdown",
+          "command": "assistant.insertLink",
+          "group": "assistant@1"
+        },
+        {
+          "when": "editorLangId == markdown",
+          "command": "assistant.showBacklinks",
+          "group": "assistant@2"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "assistant.createNote",
+          "when": "view == assistant.vaultExplorer",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "assistant.createNote",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "assistant.showGraph",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
+    "colors": [
+      {
+        "id": "assistant.accentColor",
+        "description": "Accent color for assistant UI elements",
+        "defaults": {
+          "dark": "#8e7cc3",
+          "light": "#8e7cc3",
+          "highContrast": "#9d8cd6"
+        }
+      }
+    ],
+    "icons": {
+      "assistant-logo": {
+        "description": "Assistant logo",
+        "default": {
+          "fontPath": "./resources/assistant-icons.woff",
+          "fontCharacter": "\\E001"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/sqlite3": "^3.1.8",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "typescript": "^4.9.3",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.6.0",
+    "d3": "^7.8.0",
+    "fuse.js": "^6.6.2",
+    "gray-matter": "^4.0.3",
+    "openai": "^4.0.0",
+    "remark": "^14.0.0",
+    "sqlite3": "^5.1.0",
+    "unified": "^10.1.0"
+  }
+}

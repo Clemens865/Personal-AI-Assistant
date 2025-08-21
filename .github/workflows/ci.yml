@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [16.x, 18.x]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: vscode-extension/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd vscode-extension
+        npm ci
+    
+    - name: Compile TypeScript
+      run: |
+        cd vscode-extension
+        npm run compile
+    
+    - name: Run linter
+      run: |
+        cd vscode-extension
+        npm run lint --if-present
+    
+    - name: Run tests
+      run: |
+        cd vscode-extension
+        npm test --if-present
+      env:
+        CI: true
+    
+    - name: Build VSIX package
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '18.x'
+      run: |
+        cd vscode-extension
+        npm install -g vsce
+        vsce package
+    
+    - name: Upload VSIX artifact
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '18.x'
+      uses: actions/upload-artifact@v3
+      with:
+        name: vscode-personal-assistant-vsix
+        path: vscode-extension/*.vsix
+
+  test-extension:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: vscode-extension/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd vscode-extension
+        npm ci
+    
+    - name: Setup display for VS Code tests
+      run: |
+        export DISPLAY=:99.0
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    
+    - name: Run VS Code extension tests
+      run: |
+        cd vscode-extension
+        npm run test --if-present
+      env:
+        DISPLAY: ':99.0'
