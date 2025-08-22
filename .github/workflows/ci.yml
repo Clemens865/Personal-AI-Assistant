@@ -57,7 +57,7 @@ jobs:
     
     - name: Upload VSIX artifact
       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '18.x'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: vscode-personal-assistant-vsix
         path: vscode-extension/*.vsix
